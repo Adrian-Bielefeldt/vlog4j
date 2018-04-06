@@ -12,7 +12,6 @@ public class ChemblQueries {
 	private static Variable z = Expressions.makeVariable("Z");
 	private static Variable w = Expressions.makeVariable("W");
 	private static Variable v = Expressions.makeVariable("V");
-	private static Variable u = Expressions.makeVariable("U");
 
 	private static Predicate activity = Expressions.makePredicate("http://rdf.ebi.ac.uk/terms/chembl#Activity", 1);
 	private static Predicate document = Expressions.makePredicate("http://rdf.ebi.ac.uk/terms/chembl#Document", 1);
@@ -51,7 +50,7 @@ public class ChemblQueries {
 	private static Rule chembl1 = Expressions.makeRule(chembl1Head, chembl1Body);
 
 	// SELECT ?w ?z WHERE {
-	// ?x a Molecule .?x a Activity . ?x hasMolecule ?y . 
+	// ?x a Molecule .?x a Activity . ?x hasMolecule ?y .
 	// ?z a Activity . ?z hasMolecule ?y . ?y a SmallMolecule .}
 	private static Conjunction chembl2Head = Expressions
 			.makeConjunction(Expressions.makeAtom(Expressions.makePredicate("chembl2", 2), w, z));
@@ -94,7 +93,6 @@ public class ChemblQueries {
 			return chembl3;
 		else if (queryRuleId.endsWith("4"))
 			return chembl4;
-
 		return null;
 	}
 
