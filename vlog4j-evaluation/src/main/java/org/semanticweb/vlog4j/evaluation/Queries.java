@@ -1,8 +1,6 @@
 package org.semanticweb.vlog4j.evaluation;
 
 import org.semanticweb.vlog4j.core.model.api.Rule;
-import org.semanticweb.vlog4j.core.model.api.Variable;
-import org.semanticweb.vlog4j.core.model.implementation.Expressions;
 
 public class Queries {
 

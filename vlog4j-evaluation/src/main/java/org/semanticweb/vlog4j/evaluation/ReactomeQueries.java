@@ -7,14 +7,10 @@ import org.semanticweb.vlog4j.core.model.api.Variable;
 import org.semanticweb.vlog4j.core.model.implementation.Expressions;
 
 public class ReactomeQueries {
-
 	private static Variable x = Expressions.makeVariable("X");
 	private static Variable y = Expressions.makeVariable("Y");
 	private static Variable z = Expressions.makeVariable("Z");
 	private static Variable w = Expressions.makeVariable("W");
-	private static Variable v = Expressions.makeVariable("V");
-
-	// Reactome predicates
 
 	private static Predicate biochemicalReaction = Expressions
 			.makePredicate("http://www.biopax.org/release/biopax-level3.owl#BiochemicalReaction", 1);
@@ -26,13 +22,11 @@ public class ReactomeQueries {
 			.makePredicate("http://www.biopax.org/release/biopax-level3.owl#SequenceSite", 1);
 	private static Predicate protein = Expressions
 			.makePredicate("http://www.biopax.org/release/biopax-level3.owl#Protein", 1);
-	private static Predicate physicalEntityConcept = Expressions
-			.makePredicate("http://www.biopax.org/release/biopax-level3.owl#physicalEntity", 2);
 	private static Predicate memberPhysicalEntity = Expressions
 			.makePredicate("http://www.biopax.org/release/biopax-level3.owl#memberPhysicalEntity", 2);
 	private static Predicate participant = Expressions
 			.makePredicate("http://www.biopax.org/release/biopax-level3.owl#participant", 2);
-	private static Predicate physicalEntityObjProp = Expressions
+	private static Predicate physicalEntity = Expressions
 			.makePredicate("http://www.biopax.org/release/biopax-level3.owl#physicalEntity", 2);
 	private static Predicate pathwayComponent = Expressions
 			.makePredicate("http://www.biopax.org/release/biopax-level3.owl#pathwayComponent", 2);
@@ -45,8 +39,8 @@ public class ReactomeQueries {
 	// { ?w physicalEntity ?z . ?y physicalEntity ?z . }
 	private static Conjunction reactome1Head = Expressions
 			.makeConjunction(Expressions.makeAtom(Expressions.makePredicate("reactome1", 2), y, w));
-	private static Conjunction reactome1Body = Expressions.makeConjunction(
-			Expressions.makeAtom(physicalEntityObjProp, w, z), Expressions.makeAtom(physicalEntityObjProp, y, z));
+	private static Conjunction reactome1Body = Expressions.makeConjunction(Expressions.makeAtom(physicalEntity, w, z),
+			Expressions.makeAtom(physicalEntity, y, z));
 	private static Rule reactomeQueryRule1 = Expressions.makeRule(reactome1Head, reactome1Body);
 
 	// SELECT ?x ?z WHERE {
