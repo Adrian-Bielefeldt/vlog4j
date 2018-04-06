@@ -4,15 +4,15 @@ import org.semanticweb.vlog4j.core.model.api.Rule;
 
 public class Queries {
 
-	static Rule getQuery(String queryId) {
-		if (queryId.startsWith("chembl"))
-			return getChemblQuery(queryId);
-		else if (queryId.startsWith("npd"))
-			return getNPDQuery(queryId);
-		else if (queryId.startsWith("reactome"))
-			return ReactomeQueries.getReactomeQueryRule(queryId);
-		else if (queryId.startsWith("uniprot"))
-			return getUniprotQuery(queryId);
+	static Rule getQuery(String queryRuleId) {
+		if (queryRuleId.startsWith("chembl"))
+			return getChemblQuery(queryRuleId);
+		else if (queryRuleId.startsWith("npd"))
+			return getNPDQuery(queryRuleId);
+		else if (queryRuleId.startsWith("reactome"))
+			return ReactomeQueries.getReactomeQueryRule(queryRuleId);
+		else if (queryRuleId.startsWith("uniprot"))
+			return UniprotQueries.getUniprotQuery(queryRuleId);
 
 		return null;
 	}
