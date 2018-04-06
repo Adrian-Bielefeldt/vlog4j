@@ -26,7 +26,7 @@ public class Queries {
 
 	static Rule getQuery(String queryRuleId) {
 		if (queryRuleId.startsWith("chembl"))
-			return getChemblQuery(queryRuleId);
+			return ChemblQueries.getChemblQuery(queryRuleId);
 		else if (queryRuleId.startsWith("npd"))
 			return getNPDQuery(queryRuleId);
 		else if (queryRuleId.startsWith("reactome"))
@@ -47,8 +47,4 @@ public class Queries {
 		return null;
 	}
 
-	static private Rule getUniprotQuery(String queryId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
 }

@@ -56,12 +56,12 @@ import org.semanticweb.vlog4j.owlapi.OwlToRulesConverter;
 public class ExportVLogReasoner {
 	public static void main(String[] args) throws OWLOntologyCreationException, EdbIdbSeparationException,
 			IncompatiblePredicateArityException, IOException, ReasonerStateException {
-		String tboxFilePath = "/Users/carralma/Desktop/vlog-eval/reactome/reactome-tbox-addfiltered-vlog-noInds.ttl";
-		String edbInfoFilePath = "/Users/carralma/Desktop/vlog-eval/reactome/reactome-classAss-objPropAss-csv/reactome-classAss-ObjPropAss-csv-010/edb-config-info.txt";
-		String csvFilesDirPath = "/Users/carralma/Desktop/vlog-eval/reactome/reactome-classAss-objPropAss-csv/reactome-classAss-objPropAss-csv-010";
-		String queryId = "reactome4";
-		Rule queryRule = Queries.getQuery(queryId);
-		System.out.println(queryRule);
+		String tboxFilePath = "/Users/carralma/Desktop/vlog-eval/chembl/chembl-tbox-addfiltered-vlog-noInds.ttl";
+		String edbInfoFilePath = "/Users/carralma/Desktop/vlog-eval/chembl/chembl-classAss-objPropAss-csv/chembl-classAss-ObjPropAss-csv-commas-010/edb-config-info.txt";
+		String csvFilesDirPath = "/Users/carralma/Desktop/vlog-eval/chembl/chembl-classAss-objPropAss-csv/chembl-classAss-objPropAss-csv-commas-010";
+		String queryId = "chembl3";
+		// Rule queryRule = Queries.getQuery(queryId);
+		// System.out.println(queryRule);
 
 		StringBuilder evaluationMetrics = new StringBuilder(csvFilesDirPath);
 		long startTime = System.currentTimeMillis();
@@ -84,7 +84,10 @@ public class ExportVLogReasoner {
 
 		// Loading ontology into VLog
 		reasoner.addRules(new ArrayList<Rule>(converter.getRules()));
-		reasoner.addRules(queryRule);
+		reasoner.addRules(ChemblQueries.getChemblQuery("chembl1"));
+		reasoner.addRules(ChemblQueries.getChemblQuery("chembl2"));
+		reasoner.addRules(ChemblQueries.getChemblQuery("chembl3"));
+		reasoner.addRules(ChemblQueries.getChemblQuery("chembl4"));
 		reasoner.addFacts(converter.getFacts());
 		loadSourceData(edbInfoFilePath, csvFilesDirPath, reasoner);
 		reasoner.load();
@@ -97,15 +100,10 @@ public class ExportVLogReasoner {
 		evaluationMetrics.append(",").append((reasonerReasoned - reasonerLoaded));
 
 		// Querying
-		QueryResultIterator answers = reasoner.answerQuery(Expressions.makeAtom(Expressions.makePredicate(queryId, 2),
-				Expressions.makeVariable("x"), Expressions.makeVariable("y")), true);
-		int answerCounter = 0;
-		while (answers.hasNext()) {
-			answers.next();
-			answerCounter++;
-		}
-		evaluationMetrics.append(",").append((System.currentTimeMillis() - reasonerReasoned));
-		evaluationMetrics.append(",").append(answerCounter);
+		uh("chembl1", evaluationMetrics, reasoner, reasonerReasoned);
+		uh("chembl2", evaluationMetrics, reasoner, reasonerReasoned);
+		uh("chembl3", evaluationMetrics, reasoner, reasonerReasoned);
+		uh("chembl4", evaluationMetrics, reasoner, reasonerReasoned);
 
 		// @NonNull
 		// Atom queryAtom = parseQueryAtom(query);
@@ -116,6 +114,20 @@ public class ExportVLogReasoner {
 
 		reasoner.close();
 		System.out.println(evaluationMetrics);
+	}
+
+	private static void uh(String queryId, StringBuilder evaluationMetrics, Reasoner reasoner, long reasonerReasoned)
+			throws ReasonerStateException {
+		QueryResultIterator answers = reasoner.answerQuery(Expressions.makeAtom(Expressions.makePredicate(queryId, 2),
+				Expressions.makeVariable("x"), Expressions.makeVariable("y")), true);
+		int answerCounter = 0;
+		while (answers.hasNext()) {
+			answers.next();
+			answerCounter++;
+		}
+		System.out.println(answerCounter);
+		evaluationMetrics.append(",").append((System.currentTimeMillis() - reasonerReasoned));
+		evaluationMetrics.append(",").append(answerCounter);
 	}
 
 	private static void loadSourceData(String edbInfoFilePath, String csvFilesDirPath, Reasoner reasoner)
