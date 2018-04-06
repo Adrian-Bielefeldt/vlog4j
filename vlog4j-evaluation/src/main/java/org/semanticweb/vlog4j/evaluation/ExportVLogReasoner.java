@@ -27,7 +27,10 @@ import org.semanticweb.vlog4j.core.reasoner.exceptions.IncompatiblePredicateArit
 import org.semanticweb.vlog4j.core.reasoner.exceptions.ReasonerStateException;
 import org.semanticweb.vlog4j.core.reasoner.implementation.CsvFileDataSource;
 import org.semanticweb.vlog4j.core.reasoner.implementation.QueryResultIterator;
+import org.semanticweb.vlog4j.core.reasoner.implementation.VLogReasoner;
 import org.semanticweb.vlog4j.owlapi.OwlToRulesConverter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*-
  * #%L
@@ -54,6 +57,7 @@ import org.semanticweb.vlog4j.owlapi.OwlToRulesConverter;
  *
  */
 public class ExportVLogReasoner {
+
 	public static void main(String[] args) throws OWLOntologyCreationException, EdbIdbSeparationException,
 			IncompatiblePredicateArityException, IOException, ReasonerStateException {
 		String tboxFilePath = args[0];
@@ -82,7 +86,7 @@ public class ExportVLogReasoner {
 
 		// Loading ontology into VLog
 		reasoner.addRules(new ArrayList<Rule>(converter.getRules()));
-		reasoner.addRules(NPDQueries.getNPDQuery(queryId));
+		reasoner.addRules(Queries.getQuery(queryId));
 		reasoner.addFacts(converter.getFacts());
 		loadSourceData(edbInfoFilePath, csvFilesDirPath, reasoner);
 		reasoner.load();
