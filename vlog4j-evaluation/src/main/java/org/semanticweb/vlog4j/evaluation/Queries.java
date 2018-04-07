@@ -33,6 +33,8 @@ public class Queries {
 			return ReactomeQueries.getReactomeQueryRule(queryRuleId);
 		else if (queryRuleId.startsWith("uniprot"))
 			return UniprotQueries.getUniprotQuery(queryRuleId);
+		else if (queryRuleId.startsWith("lubm"))
+			return LUBMQueries.getLUBMQuery(queryRuleId);
 		return null;
 	}
 

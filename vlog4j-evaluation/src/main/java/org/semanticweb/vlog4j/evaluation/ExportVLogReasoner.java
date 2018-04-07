@@ -58,57 +58,59 @@ public class ExportVLogReasoner {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, EdbIdbSeparationException,
 			IncompatiblePredicateArityException, IOException, ReasonerStateException {
-		String tboxFilePath = args[0];
-		String edbInfoFilePath = args[1];
-		String csvFilesDirPath = args[2];
-		String queryId = args[3];
+		final String tboxFilePath = "/Users/dragoste/Desktop/eval-files/lubm-tbox-irifiltered.ttl";
+		final String edbInfoFilePath = "/Users/dragoste/Desktop/eval-files/LUBM-025_abox_commas/edb-config-info.txt";
+		final String csvFilesDirPath = "/Users/dragoste/Desktop/eval-files/LUBM-025_abox_commas";
+		final String queryId = "lubm4";
 
-		StringBuilder evaluationMetrics = new StringBuilder(
+		final StringBuilder evaluationMetrics = new StringBuilder(
 				queryId + csvFilesDirPath.substring(csvFilesDirPath.lastIndexOf("-"), csvFilesDirPath.length()));
-		long startTime = System.currentTimeMillis();
+		final long startTime = System.currentTimeMillis();
 
-		Reasoner reasoner = Reasoner.getInstance();
+		final Reasoner reasoner = Reasoner.getInstance();
 		reasoner.setLogLevel(LogLevel.ERROR);
 		reasoner.setAlgorithm(Algorithm.RESTRICTED_CHASE);
 
 		// Loading OWL ontology TBox axioms
-		OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
-		OWLOntology tbox = manager.loadOntologyFromOntologyDocument(new File(tboxFilePath));
-		long tboxLoaded = System.currentTimeMillis();
+		final OWLOntologyManager manager = OWLManager.createOWLOntologyManager();
+		final OWLOntology tbox = manager.loadOntologyFromOntologyDocument(new File(tboxFilePath));
+		final long tboxLoaded = System.currentTimeMillis();
 		evaluationMetrics.append(",").append((tboxLoaded - startTime));
 
 		// Converting axioms
-		OwlToRulesConverter converter = new OwlToRulesConverter();
+		final OwlToRulesConverter converter = new OwlToRulesConverter();
 		converter.addOntology(tbox);
-		long tboxConverted = System.currentTimeMillis();
+		final long tboxConverted = System.currentTimeMillis();
 		evaluationMetrics.append(",").append((tboxConverted - tboxLoaded));
 
 		// Loading ontology into VLog
 		reasoner.addRules(new ArrayList<Rule>(converter.getRules()));
+		System.out.println(Queries.getQuery(queryId));
 		reasoner.addRules(Queries.getQuery(queryId));
 		reasoner.addFacts(converter.getFacts());
 		loadSourceData(edbInfoFilePath, csvFilesDirPath, reasoner);
 		reasoner.load();
-		long reasonerLoaded = System.currentTimeMillis();
+		final long reasonerLoaded = System.currentTimeMillis();
 		evaluationMetrics.append(",").append((reasonerLoaded - tboxConverted));
 
 		// Reasoning with VLog
 		reasoner.reason();
-		long reasonerReasoned = System.currentTimeMillis();
+		final long reasonerReasoned = System.currentTimeMillis();
 		evaluationMetrics.append(",").append((reasonerReasoned - reasonerLoaded));
 
 		// Querying
-		QueryResultIterator answers = reasoner.answerQuery(Expressions.makeAtom(Expressions.makePredicate(queryId, 2),
-				Expressions.makeVariable("x"), Expressions.makeVariable("y")), true);
+		final QueryResultIterator answers = reasoner
+				.answerQuery(Expressions.makeAtom(Expressions.makePredicate(queryId, 2), Expressions.makeVariable("x"),
+						Expressions.makeVariable("y")), true);
 		int answerCounter = 0;
 		int termsSizes = 0;
 		while (answers.hasNext()) {
-			QueryResult answer = answers.next();
+			final QueryResult answer = answers.next();
 			termsSizes += answer.getTerms().size();
 			answerCounter++;
 		}
 		System.out.println(termsSizes);
-		
+
 		evaluationMetrics.append(",").append((System.currentTimeMillis() - reasonerReasoned));
 		evaluationMetrics.append(",").append(answerCounter);
 
@@ -120,24 +122,25 @@ public class ExportVLogReasoner {
 
 	private static void loadSourceData(String edbInfoFilePath, String csvFilesDirPath, Reasoner reasoner)
 			throws FileNotFoundException, IOException, ReasonerStateException {
-		BufferedReader br = new BufferedReader(new FileReader(edbInfoFilePath));
+		final BufferedReader br = new BufferedReader(new FileReader(edbInfoFilePath));
 		String edbConfigLine;
 		while ((edbConfigLine = br.readLine()) != null) {
-			String edbPredicateName = edbConfigLine.substring(1, edbConfigLine.indexOf(" ") - 1) + "EDB";
-			String predicateName = edbConfigLine.substring(1, edbConfigLine.indexOf(" ") - 1);
-			int arity = Integer
+			final String edbPredicateName = edbConfigLine.substring(1, edbConfigLine.indexOf(" ") - 1) + "EDB";
+			final String predicateName = edbConfigLine.substring(1, edbConfigLine.indexOf(" ") - 1);
+			final int arity = Integer
 					.parseInt(edbConfigLine.substring(edbConfigLine.lastIndexOf(" ") + 1, edbConfigLine.length()));
-			Predicate edbPredicate = new PredicateImpl(edbPredicateName, arity);
-			Predicate predicate = new PredicateImpl(predicateName, arity);
+			final Predicate edbPredicate = new PredicateImpl(edbPredicateName, arity);
+			final Predicate predicate = new PredicateImpl(predicateName, arity);
 
-			ArrayList<Term> arguments = new ArrayList<>();
+			final ArrayList<Term> arguments = new ArrayList<>();
 			for (int i = 0; i < arity; i++)
 				arguments.add(Expressions.makeVariable("X" + i));
 			reasoner.addRules(new RuleImpl(Expressions.makeConjunction(new AtomImpl(predicate, arguments)),
 					Expressions.makeConjunction(new AtomImpl(edbPredicate, arguments))));
 
-			String fileName = edbConfigLine.substring(edbConfigLine.indexOf(" ") + 1, edbConfigLine.lastIndexOf(" "));
-			String pathname = csvFilesDirPath + File.separator + fileName;
+			final String fileName = edbConfigLine.substring(edbConfigLine.indexOf(" ") + 1,
+					edbConfigLine.lastIndexOf(" "));
+			final String pathname = csvFilesDirPath + File.separator + fileName;
 			final DataSource edbDataSource = new CsvFileDataSource(new File(pathname));
 
 			reasoner.addFactsFromDataSource(edbPredicate, edbDataSource);
