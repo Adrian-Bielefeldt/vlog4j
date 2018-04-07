@@ -12,6 +12,7 @@ import org.semanticweb.owlapi.model.OWLOntology;
 import org.semanticweb.owlapi.model.OWLOntologyCreationException;
 import org.semanticweb.owlapi.model.OWLOntologyManager;
 import org.semanticweb.vlog4j.core.model.api.Predicate;
+import org.semanticweb.vlog4j.core.model.api.QueryResult;
 import org.semanticweb.vlog4j.core.model.api.Rule;
 import org.semanticweb.vlog4j.core.model.api.Term;
 import org.semanticweb.vlog4j.core.model.implementation.AtomImpl;
@@ -27,10 +28,7 @@ import org.semanticweb.vlog4j.core.reasoner.exceptions.IncompatiblePredicateArit
 import org.semanticweb.vlog4j.core.reasoner.exceptions.ReasonerStateException;
 import org.semanticweb.vlog4j.core.reasoner.implementation.CsvFileDataSource;
 import org.semanticweb.vlog4j.core.reasoner.implementation.QueryResultIterator;
-import org.semanticweb.vlog4j.core.reasoner.implementation.VLogReasoner;
 import org.semanticweb.vlog4j.owlapi.OwlToRulesConverter;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /*-
  * #%L
@@ -65,7 +63,8 @@ public class ExportVLogReasoner {
 		String csvFilesDirPath = args[2];
 		String queryId = args[3];
 
-		StringBuilder evaluationMetrics = new StringBuilder(csvFilesDirPath);
+		StringBuilder evaluationMetrics = new StringBuilder(
+				queryId + csvFilesDirPath.substring(csvFilesDirPath.lastIndexOf("-"), csvFilesDirPath.length()));
 		long startTime = System.currentTimeMillis();
 
 		Reasoner reasoner = Reasoner.getInstance();
@@ -102,22 +101,21 @@ public class ExportVLogReasoner {
 		QueryResultIterator answers = reasoner.answerQuery(Expressions.makeAtom(Expressions.makePredicate(queryId, 2),
 				Expressions.makeVariable("x"), Expressions.makeVariable("y")), true);
 		int answerCounter = 0;
+		int termsSizes = 0;
 		while (answers.hasNext()) {
-			answers.next();
+			QueryResult answer = answers.next();
+			termsSizes += answer.getTerms().size();
 			answerCounter++;
 		}
+		System.out.println(termsSizes);
+		
 		evaluationMetrics.append(",").append((System.currentTimeMillis() - reasonerReasoned));
 		evaluationMetrics.append(",").append(answerCounter);
 
-		// @NonNull
-		// Atom queryAtom = parseQueryAtom(query);
-		// long queryParsed = System.currentTimeMillis();
-		// reasoner.answerQuery(queryAtom, true);
-		// evaluationInformation.append(",").append((System.currentTimeMillis() -
-		// queryParsed));
-
+		answers.close();
 		reasoner.close();
 		System.out.println(evaluationMetrics);
+		System.out.println();
 	}
 
 	private static void loadSourceData(String edbInfoFilePath, String csvFilesDirPath, Reasoner reasoner)
