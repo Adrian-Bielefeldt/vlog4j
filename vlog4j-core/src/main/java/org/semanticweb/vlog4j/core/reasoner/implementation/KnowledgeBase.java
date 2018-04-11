@@ -14,32 +14,31 @@ import org.semanticweb.vlog4j.core.model.api.Predicate;
 import org.semanticweb.vlog4j.core.model.api.Rule;
 import org.semanticweb.vlog4j.core.model.api.Term;
 import org.semanticweb.vlog4j.core.reasoner.DataSource;
-import org.semanticweb.vlog4j.core.reasoner.exceptions.EdbIdbSeparationException;
 
 class KnowledgeBase {
 
 	private final List<Rule> rules = new ArrayList<>();
-	private final Map<Predicate, Set<Atom>> factsForPredicate = new HashMap<>();
-	private final Map<Predicate, DataSource> dataSourceForPredicate = new HashMap<>();
+	private Map<Predicate, Set<Atom>> factsForPredicate = new HashMap<>();
+	private Map<Predicate, DataSource> dataSourceForPredicate = new HashMap<>();
 
 	List<Rule> getRules() {
-		return rules;
+		return this.rules;
 	}
 
 	Set<Predicate> getInMemoryFactsPredicates() {
-		return factsForPredicate.keySet();
+		return this.factsForPredicate.keySet();
 	}
 
 	Set<Atom> getInMemoryFactsForPredicate(Predicate predicate) {
-		return factsForPredicate.get(predicate);
+		return this.factsForPredicate.get(predicate);
 	}
 
 	Set<Predicate> getDataSourceFactsPredicates() {
-		return dataSourceForPredicate.keySet();
+		return this.dataSourceForPredicate.keySet();
 	}
 
 	DataSource getDataSourceForPredicate(Predicate predicate) {
-		return dataSourceForPredicate.get(predicate);
+		return this.dataSourceForPredicate.get(predicate);
 	}
 
 	void addRules(final List<Rule> rules) {
@@ -68,49 +67,51 @@ class KnowledgeBase {
 				"Multiple data sources for the same predicate are not allowed! Facts for predicate [%s] alredy added in memory: %s",
 				predicate, factsForPredicate.get(predicate));
 
-		dataSourceForPredicate.put(predicate, dataSource);
-	}
-
-	void validateEdbIdbSeparation() throws EdbIdbSeparationException {
-		final Set<Predicate> intersection = predicatesEdbIdb();
-		if (!intersection.isEmpty()) {
-			throw new EdbIdbSeparationException(intersection);
-		}
-	}
-
-	Set<Predicate> predicatesEdbIdb() {
-		final Set<Predicate> edbPredicates = collectEdbPredicates();
-		final Set<Predicate> idbPredicates = collectIdbPredicates();
-		final Set<Predicate> intersection = new HashSet<>(edbPredicates);
-		intersection.retainAll(idbPredicates);
-		return intersection;
+		this.dataSourceForPredicate.put(predicate, dataSource);
 	}
 
 	/**
 	 * 
 	 * @return true, if the knowledge base was modified. False, otherwise.
 	 */
-	boolean handleEdbIdbSeparation() {
-		final Set<Predicate> predicatesEdbIdb = predicatesEdbIdb();
-		// for each, 1. rename P to SRC_P
-		// 2. add rule SRC_P to P
-		// TODO validate if we can change here
+	 boolean handleEdbIdbSeparation() {
+		// TODO validate reasoner state
+		final Set<Predicate> edbIdbPredicates = getEdbIdbPredicates();
+		final boolean hasEdbIdbPredicates = edbIdbPredicates.isEmpty();
+		if (hasEdbIdbPredicates) {
+			final EdbIdbSeparationHander edbIdbSeparationHander = new EdbIdbSeparationHander(edbIdbPredicates);
 
+			this.dataSourceForPredicate = edbIdbSeparationHander.toEdbPredicates(this.dataSourceForPredicate);
+			this.factsForPredicate = edbIdbSeparationHander.toEdbPredicates(this.factsForPredicate);
+			this.rules.addAll(edbIdbSeparationHander.generateEdbPredicateToPredicateRules());
+		}
+		return hasEdbIdbPredicates;
+	}
 
-		return predicatesEdbIdb.isEmpty();
+	 boolean hasEdbIdbPredicates() {
+		final Set<Predicate> intersection = getEdbIdbPredicates();
+		return !intersection.isEmpty();
+	}
+
+	Set<Predicate> getEdbIdbPredicates() {
+		final Set<Predicate> edbPredicates = collectEdbPredicates();
+		final Set<Predicate> idbPredicates = collectIdbPredicates();
+		final Set<Predicate> intersection = new HashSet<>(idbPredicates);
+		intersection.retainAll(edbPredicates);
+		return intersection;
 	}
 
 	private Set<Predicate> collectEdbPredicates() {
 		final Set<Predicate> edbPredicates = new HashSet<>();
-		edbPredicates.addAll(dataSourceForPredicate.keySet());
-		edbPredicates.addAll(factsForPredicate.keySet());
+		edbPredicates.addAll(getInMemoryFactsPredicates());
+		edbPredicates.addAll(getDataSourceFactsPredicates());
 		return edbPredicates;
 	}
 
-	// TODO precompute this when rules are added
+	// TODO generate this when adding rules
 	private Set<Predicate> collectIdbPredicates() {
 		final Set<Predicate> idbPredicates = new HashSet<>();
-		for (final Rule rule : rules) {
+		for (final Rule rule : this.rules) {
 			for (final Atom headAtom : rule.getHead()) {
 				idbPredicates.add(headAtom.getPredicate());
 			}
@@ -130,7 +131,7 @@ class KnowledgeBase {
 	private void validateNoDataSourceForPredicate(final Predicate predicate) {
 		Validate.isTrue(!dataSourceForPredicate.containsKey(predicate),
 				"Multiple data sources for the same predicate are not allowed! Facts for predicate [%s] alredy added from data source: %s",
-				predicate, dataSourceForPredicate.get(predicate));
+				predicate, this.dataSourceForPredicate.get(predicate));
 	}
 
 }

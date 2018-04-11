@@ -103,7 +103,7 @@ public class VLogReasonerWithKB implements Reasoner {
 			throw new ReasonerStateException(this.reasonerState,
 					"Rules cannot be added after the reasoner has been loaded! Call reset() to undo loading and reasoning.");
 		}
-		knowledgeBase.addRules(rules);
+		this.knowledgeBase.addRules(rules);
 	}
 
 	@Override
@@ -150,11 +150,16 @@ public class VLogReasonerWithKB implements Reasoner {
 		if (this.reasonerState != ReasonerState.BEFORE_LOADING) {
 			LOGGER.warn("This method call is ineffective: the Reasoner has already been loaded.");
 		} else {
-			this.knowledgeBase.validateEdbIdbSeparation();
+
+			final Set<Predicate> edbIdbPredicates = this.knowledgeBase.getEdbIdbPredicates();
+			if (!edbIdbPredicates.isEmpty()) {
+				throw new EdbIdbSeparationException(edbIdbPredicates);
+			}
 
 			this.reasonerState = ReasonerState.AFTER_LOADING;
 
-			if (this.knowledgeBase.getDataSourceFactsPredicates().isEmpty() && this.knowledgeBase.getInMemoryFactsPredicates().isEmpty()) {
+			if (this.knowledgeBase.getDataSourceFactsPredicates().isEmpty()
+					&& this.knowledgeBase.getInMemoryFactsPredicates().isEmpty()) {
 				LOGGER.warn("No facts have been provided.");
 			}
 
@@ -165,7 +170,7 @@ public class VLogReasonerWithKB implements Reasoner {
 			} catch (final EDBConfigurationException e) {
 				throw new RuntimeException("Invalid data sources configuration.", e);
 			}
-			
+
 			validateDataSourcePredicateArities();
 
 			loadInMemoryFacts();
@@ -270,8 +275,6 @@ public class VLogReasonerWithKB implements Reasoner {
 		this.vLog.stop();
 	}
 
-	
-
 	String generateDataSourcesConfig() {
 		final StringBuilder configStringBuilder = new StringBuilder();
 		int dataSourceIndex = 0;
@@ -301,7 +304,8 @@ public class VLogReasonerWithKB implements Reasoner {
 	}
 
 	private void loadRules() {
-		final karmaresearch.vlog.Rule[] vLogRuleArray = ModelToVLogConverter.toVLogRuleArray(this.knowledgeBase.getRules());
+		final karmaresearch.vlog.Rule[] vLogRuleArray = ModelToVLogConverter
+				.toVLogRuleArray(this.knowledgeBase.getRules());
 		final karmaresearch.vlog.VLog.RuleRewriteStrategy vLogRuleRewriteStrategy = ModelToVLogConverter
 				.toVLogRuleRewriteStrategy(this.ruleRewriteStrategy);
 		try {
