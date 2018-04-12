@@ -54,14 +54,14 @@ import org.semanticweb.vlog4j.owlapi.OwlToRulesConverter;
  * Hello world!
  *
  */
-public class ExportVLogReasoner {
+public class VLogReasoner {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, EdbIdbSeparationException,
 			IncompatiblePredicateArityException, IOException, ReasonerStateException {
-		final String tboxFilePath = "/Users/dragoste/Desktop/eval-files/lubm-tbox-irifiltered.ttl";
-		final String edbInfoFilePath = "/Users/dragoste/Desktop/eval-files/LUBM-025_abox_commas/edb-config-info.txt";
-		final String csvFilesDirPath = "/Users/dragoste/Desktop/eval-files/LUBM-025_abox_commas";
-		final String queryId = "lubm4";
+		final String tboxFilePath = args[0];
+		final String edbInfoFilePath = args[1];
+		final String csvFilesDirPath = args[2];
+		final String queryId = args[3];
 
 		final StringBuilder evaluationMetrics = new StringBuilder(
 				queryId + csvFilesDirPath.substring(csvFilesDirPath.lastIndexOf("-"), csvFilesDirPath.length()));
