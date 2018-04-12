@@ -8,9 +8,9 @@
 		<artifactId>vlog4j-parent</artifactId>
 		<version>0.0.1-SNAPSHOT</version>
 	</parent>
-	<groupId>org.semanticweb.vlog4j</groupId>
+	
 	<artifactId>vlog4j-evaluation</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	
 	<name>vlog4j-evaluation</name>
 	<url>http://maven.apache.org</url>
 	<properties>

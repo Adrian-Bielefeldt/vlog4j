@@ -63,8 +63,7 @@ public class VLogReasonerLauncher {
 		final String csvFilesDirPath = args[2];
 		final String queryId = args[3];
 
-		final StringBuilder evaluationMetrics = new StringBuilder(
-				queryId + csvFilesDirPath.substring(csvFilesDirPath.lastIndexOf("-"), csvFilesDirPath.length()));
+		final StringBuilder evaluationMetrics = new StringBuilder(queryId);
 		final long startTime = System.currentTimeMillis();
 
 		final Reasoner reasoner = Reasoner.getInstance();
