@@ -189,7 +189,6 @@ public class VLogReasoner implements Reasoner {
 		if (this.reasonerState != ReasonerState.BEFORE_LOADING) {
 			LOGGER.warn("This method call is ineffective: the Reasoner has already been loaded.");
 		} else {
-			System.out.println("aaaaa");
 			// validateEdbIdbSeparation();
 
 			this.reasonerState = ReasonerState.AFTER_LOADING;
