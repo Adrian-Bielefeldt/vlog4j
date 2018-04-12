@@ -13,23 +13,16 @@ public class LUBMQueries {
 	private static final Variable y = new VariableImpl("y");
 	private static final Variable z = new VariableImpl("z");
 	private static final Variable w = new VariableImpl("w");
-	private static final Variable u = new VariableImpl("u");
-	private static final Variable v = new VariableImpl("v");
-	private static final Variable t = new VariableImpl("t");
 
 	private static final Predicate worksFor = Expressions
 			.makePredicate("http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#worksFor", 2);
 	private static final Predicate publicationAuthor = Expressions
 			.makePredicate("http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#publicationAuthor", 2);
 
-	private static final String advisor = "http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#advisor";
-	private static final String faculty = "http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#Faculty";
 	private static final String teacherOf = "http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#teacherOf";
-	private static final String course = "http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#Course";
 	private static final String memberOf = "http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#memberOf";
 	private static final String department = "http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#Department";
 	private static final String takesCourse = "http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#takesCourse";
-	private static final String student = "http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#Student";
 
 	/*
 	 * SELECT ?x ?z

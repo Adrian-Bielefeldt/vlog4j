@@ -109,7 +109,6 @@ public class VLogReasonerLauncher {
 			termsSizes += answer.getTerms().size();
 			answerCounter++;
 		}
-		System.out.println(termsSizes);
 
 		evaluationMetrics.append(",").append((System.currentTimeMillis() - reasonerReasoned));
 		evaluationMetrics.append(",").append(answerCounter);

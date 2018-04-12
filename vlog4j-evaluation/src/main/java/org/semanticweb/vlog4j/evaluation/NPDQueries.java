@@ -11,7 +11,6 @@ public class NPDQueries {
 	private static Variable y = Expressions.makeVariable("Y");
 	private static Variable z = Expressions.makeVariable("Z");
 	private static Variable w = Expressions.makeVariable("W");
-	private static Variable v = Expressions.makeVariable("V");
 
 	private static Predicate well = Expressions.makePredicate("http://sws.ifi.uio.no/vocab/npd-v2#Well", 1);
 
