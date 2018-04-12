@@ -54,7 +54,7 @@ import org.semanticweb.vlog4j.owlapi.OwlToRulesConverter;
  * Hello world!
  *
  */
-public class VLogReasoner {
+public class VLogReasonerLauncher {
 
 	public static void main(String[] args) throws OWLOntologyCreationException, EdbIdbSeparationException,
 			IncompatiblePredicateArityException, IOException, ReasonerStateException {
