@@ -25,16 +25,11 @@ public class LUBMQueries {
 	private static final String takesCourse = "http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#takesCourse";
 
 	/*
-	 * SELECT ?x ?z
-	 * 
-	 * WHERE
-	 * 
-	 * { ?x <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#worksFor> ?y .
-	 * 
-	 * ?z <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#worksFor> ?y .
-	 * 
-	 * ?w <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#publicationAuthor>
-	 * ?z . }
+	 * SELECT ?x ?z WHERE { ?x
+	 * <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#worksFor> ?y . ?z
+	 * <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#worksFor> ?y . ?w
+	 * <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#publicationAuthor> ?z .
+	 * }
 	 */
 	private static final Atom lubm1Head = Expressions.makeAtom("lubm1", x, z);
 	private static final Atom lubm1bodyAtom1 = Expressions.makeAtom(worksFor, x, y);
@@ -43,11 +38,9 @@ public class LUBMQueries {
 	private static final Rule lubm1 = Expressions.makeRule(lubm1Head, lubm1bodyAtom1, lubm1bodyAtom2, lubm1bodyAtom3);
 
 	/*
-	 * SELECT?x WHERE
-	 * 
-	 * { ?x <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#advisor> ?y .
-	 * 
-	 * ?y <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>
+	 * SELECT?x WHERE { ?x
+	 * <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#advisor> ?y . ?y
+	 * <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>
 	 * <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#Faculty> .
 	 * 
 	 * ?y <http://www.lehigh.edu/~zhp2/2004/0401/univ-bench.owl#teacherOf> ?z .
