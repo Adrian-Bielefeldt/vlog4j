@@ -1,6 +1,27 @@
 package org.semanticweb.vlog4j.core.reasoner.implementation;
 
+/*-
+ * #%L
+ * VLog4j Core Components
+ * %%
+ * Copyright (C) 2018 VLog4j Developers
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,9 +62,17 @@ class KnowledgeBase {
 		return this.dataSourceForPredicate.get(predicate);
 	}
 
+	void addRules(final Rule... rules) {
+		addRules(Arrays.asList(rules));
+	}
+
 	void addRules(final List<Rule> rules) {
 		Validate.noNullElements(rules, "Null rules are not alowed! The list contains a null at position [%d].");
 		this.rules.addAll(new ArrayList<>(rules));
+	}
+
+	public void addFacts(final Atom... facts) {
+		addFacts(Arrays.asList(facts));
 	}
 
 	void addFacts(final Collection<Atom> facts) {
@@ -63,9 +92,9 @@ class KnowledgeBase {
 		Validate.notNull(predicate, "Null predicates are not allowed!");
 		Validate.notNull(dataSource, "Null dataSources are not allowed!");
 		validateNoDataSourceForPredicate(predicate);
-		Validate.isTrue(!factsForPredicate.containsKey(predicate),
+		Validate.isTrue(!this.factsForPredicate.containsKey(predicate),
 				"Multiple data sources for the same predicate are not allowed! Facts for predicate [%s] alredy added in memory: %s",
-				predicate, factsForPredicate.get(predicate));
+				predicate, this.factsForPredicate.get(predicate));
 
 		this.dataSourceForPredicate.put(predicate, dataSource);
 	}
@@ -77,7 +106,7 @@ class KnowledgeBase {
 	 boolean handleEdbIdbSeparation() {
 		// TODO validate reasoner state
 		final Set<Predicate> edbIdbPredicates = getEdbIdbPredicates();
-		final boolean hasEdbIdbPredicates = edbIdbPredicates.isEmpty();
+		final boolean hasEdbIdbPredicates = !edbIdbPredicates.isEmpty();
 		if (hasEdbIdbPredicates) {
 			final EdbIdbSeparationHander edbIdbSeparationHander = new EdbIdbSeparationHander(edbIdbPredicates);
 
@@ -108,7 +137,7 @@ class KnowledgeBase {
 		return edbPredicates;
 	}
 
-	// TODO generate this when adding rules
+	// TODO perhaps generate this when adding rules
 	private Set<Predicate> collectIdbPredicates() {
 		final Set<Predicate> idbPredicates = new HashSet<>();
 		for (final Rule rule : this.rules) {
@@ -129,7 +158,7 @@ class KnowledgeBase {
 	}
 
 	private void validateNoDataSourceForPredicate(final Predicate predicate) {
-		Validate.isTrue(!dataSourceForPredicate.containsKey(predicate),
+		Validate.isTrue(!this.dataSourceForPredicate.containsKey(predicate),
 				"Multiple data sources for the same predicate are not allowed! Facts for predicate [%s] alredy added from data source: %s",
 				predicate, this.dataSourceForPredicate.get(predicate));
 	}

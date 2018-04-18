@@ -1,5 +1,25 @@
 package org.semanticweb.vlog4j.core.reasoner.implementation;
 
+/*-
+ * #%L
+ * VLog4j Core Components
+ * %%
+ * Copyright (C) 2018 VLog4j Developers
+ * %%
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * #L%
+ */
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -45,7 +65,9 @@ final class EdbIdbSeparationHander {
 	/**
 	 * Prefix used for renaming facts predicates.
 	 */
-	static String EDB_PREFIX = "EDB-";
+	final static String EDB_PREFIX = "EDB-";
+
+	final static String VARIABLE_NAME_PREFIX = "x";
 
 	/**
 	 * Set of {@link Predicate}s that are both EDB (appear in fact atoms) and IDB
@@ -63,33 +85,6 @@ final class EdbIdbSeparationHander {
 	 */
 	EdbIdbSeparationHander(Set<Predicate> edbIdbPredicates) {
 		this.edbIdbPredicates = edbIdbPredicates;
-	}
-
-	<T> Map<Predicate, T> toEdbPredicates(Map<Predicate, T> dataSourcesForPredicate) {
-		final Map<Predicate, T> dataSourcesForEdbPredicate = new HashMap<>();
-		dataSourcesForEdbPredicate.entrySet().forEach(entry -> {
-
-			if (edbIdbPredicates.contains(entry.getKey())) {
-				final Predicate edbPredicate = generateEdbPredicate(entry.getKey());
-				dataSourcesForEdbPredicate.put(edbPredicate, entry.getValue());
-			} else {
-				dataSourcesForEdbPredicate.put(entry.getKey(), entry.getValue());
-			}
-
-		});
-		return dataSourcesForEdbPredicate;
-	}
-
-	List<Rule> generateEdbPredicateToPredicateRules() {
-		final List<Rule> edbPredicateToPredicateRules = new ArrayList<>();
-
-		this.edbIdbPredicates.forEach(predicate -> {
-			final Atom headPredicateAtom = generateAtomWithDistinctVariables(predicate);
-			final Atom bodyEdbPredicateAtom = generateAtomWithDistinctVariables(generateEdbPredicate(predicate));
-			final Rule rule = Expressions.makeRule(headPredicateAtom, bodyEdbPredicateAtom);
-			edbPredicateToPredicateRules.add(rule);
-		});
-		return edbPredicateToPredicateRules;
 	}
 
 	/**
@@ -119,13 +114,42 @@ final class EdbIdbSeparationHander {
 	 * @return an atom with given {@code predicate} and terms of type
 	 *         {@link TermType#VARIABLE}, each with a distinct name.
 	 */
-	private static Atom generateAtomWithDistinctVariables(Predicate predicate) {
+	static Atom generateAtomWithDistinctVariables(Predicate predicate) {
 		final List<Term> terms = new ArrayList<>();
 		for (int i = 0; i < predicate.getArity(); i++) {
-			final Variable variableI = new VariableImpl("x" + i);
+			final Variable variableI = new VariableImpl(VARIABLE_NAME_PREFIX + i);
 			terms.add(variableI);
 		}
 		return new AtomImpl(predicate, terms);
+	}
+
+	<T> Map<Predicate, T> toEdbPredicates(Map<Predicate, T> dataForPredicate) {
+		final Map<Predicate, T> dataSourcesForEdbPredicate = new HashMap<>();
+		dataForPredicate.entrySet().forEach(entry -> {
+			final Predicate predicate = entry.getKey();
+			final T value = entry.getValue();
+
+			if (this.edbIdbPredicates.contains(predicate)) {
+				final Predicate edbPredicate = generateEdbPredicate(predicate);
+				dataSourcesForEdbPredicate.put(edbPredicate, value);
+			} else {
+				dataSourcesForEdbPredicate.put(predicate, value);
+			}
+
+		});
+		return dataSourcesForEdbPredicate;
+	}
+
+	List<Rule> generateEdbPredicateToPredicateRules() {
+		final List<Rule> edbPredicateToPredicateRules = new ArrayList<>();
+
+		this.edbIdbPredicates.forEach(predicate -> {
+			final Atom headPredicateAtom = generateAtomWithDistinctVariables(predicate);
+			final Atom bodyEdbPredicateAtom = generateAtomWithDistinctVariables(generateEdbPredicate(predicate));
+			final Rule rule = Expressions.makeRule(headPredicateAtom, bodyEdbPredicateAtom);
+			edbPredicateToPredicateRules.add(rule);
+		});
+		return edbPredicateToPredicateRules;
 	}
 
 }
