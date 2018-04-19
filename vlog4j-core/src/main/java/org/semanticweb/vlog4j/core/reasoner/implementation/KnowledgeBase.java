@@ -38,6 +38,20 @@ import org.semanticweb.vlog4j.core.reasoner.DataSource;
 
 class KnowledgeBase {
 
+	// in the reasoner constructor
+	// default constructor with an empty kb
+	// TODO getters
+	// not immutable
+	// copy constructors for mutable objects
+
+	// Incremental reasoning problem: materialize with pred P, then the user adds
+	// more rules%facts, P needs to be renamed but you already
+	// hide this from the user
+	// rename ALL facts to EDB predicates (make sure incremental reasoning does not
+	// change ...)
+	// rewrite rules such that you can reuse predicates from different data sources
+	// have a switch off mode
+
 	private final List<Rule> rules = new ArrayList<>();
 	private Map<Predicate, Set<Atom>> factsForPredicate = new HashMap<>();
 	private Map<Predicate, DataSource> dataSourceForPredicate = new HashMap<>();
@@ -99,11 +113,13 @@ class KnowledgeBase {
 		this.dataSourceForPredicate.put(predicate, dataSource);
 	}
 
+	// should it return a new kb?
+
 	/**
 	 * 
 	 * @return true, if the knowledge base was modified. False, otherwise.
 	 */
-	 boolean handleEdbIdbSeparation() {
+	 boolean updateKnowledgeBaseToEnsureEdbIdbSeparation() {
 		// TODO validate reasoner state
 		final Set<Predicate> edbIdbPredicates = getEdbIdbPredicates();
 		final boolean hasEdbIdbPredicates = !edbIdbPredicates.isEmpty();

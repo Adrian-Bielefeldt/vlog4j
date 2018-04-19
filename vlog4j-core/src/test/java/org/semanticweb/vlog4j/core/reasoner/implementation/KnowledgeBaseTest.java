@@ -53,7 +53,7 @@ public class KnowledgeBaseTest {
 		assertTrue(knowledgeBase.hasEdbIdbPredicates());
 		assertEquals(Sets.newSet(new PredicateImpl("q", 1)), knowledgeBase.getEdbIdbPredicates());
 
-		final boolean changed = knowledgeBase.handleEdbIdbSeparation();
+		final boolean changed = knowledgeBase.updateKnowledgeBaseToEnsureEdbIdbSeparation();
 		assertTrue(changed);
 		assertFalse(knowledgeBase.hasEdbIdbPredicates());
 		assertTrue(knowledgeBase.getEdbIdbPredicates().isEmpty());
