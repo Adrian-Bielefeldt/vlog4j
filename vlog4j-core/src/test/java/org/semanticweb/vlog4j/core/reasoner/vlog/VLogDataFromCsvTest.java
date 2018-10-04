@@ -21,7 +21,7 @@ package org.semanticweb.vlog4j.core.reasoner.vlog;
  */
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -43,8 +43,8 @@ public class VLogDataFromCsvTest {
 
 	private static final String unzippedUnaryPredicateNameP = "p";
 	private static final String unzippedUnaryPredicateNameQ = "q";
-	private static final String zippedUnaryPredicateNameP = "pz";
-	private static final String zippedUnaryPredicateNameQ = "qz";
+	private static final String zippedUnaryPredicateNameP = "p_z";
+	private static final String zippedUnaryPredicateNameQ = "q_z";
 
 	private final List<List<Term>> expectedUnaryQueryResult = Arrays.asList(
 			Arrays.asList(VLogExpressions.makeConstant("c1")), Arrays.asList(VLogExpressions.makeConstant("c2")));
@@ -85,11 +85,9 @@ public class VLogDataFromCsvTest {
 		assertEquals(this.expectedUnaryQueryResult, queryResultQ);
 		assertEquals(queryResultQ, queryResultZippedQ);
 
-		final TermQueryResultIterator queryResultsRIterator = vLog
-				.query(new Atom("t", VLogExpressions.makeVariable("x")));
-		assertFalse(queryResultsRIterator.hasNext());
+		final List<List<Term>> queryResultsT = getUnaryQueryResults(vLog, "t");
+		assertTrue(queryResultsT.isEmpty());
 
-		queryResultsRIterator.close();
 		vLog.stop();
 	}
 }
